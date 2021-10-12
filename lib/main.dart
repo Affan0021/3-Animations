@@ -1,80 +1,97 @@
 import 'package:flutter/material.dart';
-
-import 'new.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main()
 {
   runApp(MaterialApp(
-
-    home: Main(),
+    home: FlutterSpinKitExample(),
   ));
 }
 
-class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
 
-
+class FlutterSpinKitExample extends StatefulWidget {
   @override
-  _MainState createState() => _MainState();
+  _FlutterSpinKitExampleState createState() => _FlutterSpinKitExampleState();
 }
 
-class _MainState extends State<Main> {
+class _FlutterSpinKitExampleState extends State<FlutterSpinKitExample>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-         body: SingleChildScrollView(
+      appBar: AppBar(
+        title: Text("Flutter Spinkit"),
+      ),
+      body: GridView.count(
+        crossAxisCount: 5,
+        children: <Widget>[
+          SpinKitRotatingCircle(color: Colors.blue),
+          SpinKitRotatingPlain(color: Colors.yellow),
+          SpinKitChasingDots(color: Colors.red),
+          SpinKitPumpingHeart(color: Colors.blueGrey),
+          SpinKitPulse(color: Colors.pinkAccent),
+          SpinKitDoubleBounce(color: Colors.amber),
 
-           child: Stack(
+          //Waves
+          SpinKitWave(color: Colors.red, type: SpinKitWaveType.start),
+          SpinKitWave(color: Colors.green, type: SpinKitWaveType.center),
+          SpinKitWave(color: Colors.blue, type: SpinKitWaveType.end),
 
-             children: [
+          //Wander cubes
+          SpinKitThreeBounce(color: Colors.pink),
+          SpinKitWanderingCubes(color: Colors.lime),
+          SpinKitWanderingCubes(color: Colors.orange, shape: BoxShape.circle),
 
-               Container(
-                 margin: EdgeInsets.only(top: 400),
-                 child: ElevatedButton(
+          //circle & fading four
+          SpinKitCircle(
+            color: Colors.tealAccent,
+            duration: (2),
 
-                   onPressed: (){
-                     // Navigator.push(
-                     //   context,
-                     //   MaterialPageRoute(builder: (context) => Main()),
-                     // );
-                     Navigator.push(
-                       context,
-                       PageRouteBuilder(
-                       transitionDuration : Duration(seconds: 1),
-                         transitionsBuilder:
-                         (context , animation , animationTime , child)
-                         {
-                           animation = CurvedAnimation(
+          ),
+          SpinKitFadingFour(color: Colors.white),
+          SpinKitFadingFour(color: Colors.indigo, shape: BoxShape.rectangle),
 
-                             parent : animation , curve: Curves.ease);
-                           return ScaleTransition(
-                             alignment: Alignment.center,
-                             scale : animation,
-                             child : child,
-                           );
-                         },
-                         pageBuilder : (context , animation , animationTime)
-                           {
-                             return New();
-                           }
-                       )
-                     );
+          //fading cubes
+          SpinKitFadingCube(color: Colors.cyan),
+          SpinKitCubeGrid(size: 51.0, color: Colors.pinkAccent),
+          SpinKitFoldingCube(color: Colors.lightBlue),
 
-                   },
-                   child : Text('goto page')
+          //Ring
 
+          SpinKitRing(color: Colors.redAccent),
+          SpinKitDualRing(color: Colors.amberAccent),
+          SpinKitRipple(color: Colors.greenAccent),
 
-                 ),
+          //Grid
+          SpinKitFadingGrid(color: Colors.teal),
+          SpinKitFadingGrid(color: Colors.purple, shape: BoxShape.rectangle),
 
-               )
+          //spinning
+          SpinKitSpinningCircle(color: Colors.deepOrange),
+          SpinKitSpinningCircle(
+              color: Colors.deepPurpleAccent, shape: BoxShape.rectangle),
 
-             ],
+          //hourglass
+          SpinKitHourGlass(color: Colors.blueAccent),
+          //SpinKitPouringHourglass(color: Colors.redAccent),
 
-
-           ),
-
-
-         ),
+          SpinKitFadingCircle(
+            itemBuilder: (BuildContext context, int index) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: index.isEven ? Colors.red : Colors.green,
+                ),
+              );
+            },
+          ),
+          SpinKitSquareCircle(
+            color: Colors.green,
+            size: 50.0,
+            controller: AnimationController(
+                vsync: this, duration: Duration(milliseconds: 200)),
+          ),
+        ],
+      ),
     );
   }
 }
