@@ -1,96 +1,301 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'constants.dart';
+import 'file.dart';
 
-void main()
-{
-  runApp(MaterialApp(
-    home: FlutterSpinKitExample(),
-  ));
+void main() {
+  runApp(MyApp());
 }
 
-
-class FlutterSpinKitExample extends StatefulWidget {
-  @override
-  _FlutterSpinKitExampleState createState() => _FlutterSpinKitExampleState();
-}
-
-class _FlutterSpinKitExampleState extends State<FlutterSpinKitExample>
-    with TickerProviderStateMixin {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Flutter Spinkit"),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      body: GridView.count(
-        crossAxisCount: 5,
-        children: <Widget>[
-          SpinKitRotatingCircle(color: Colors.blue),
-          SpinKitRotatingPlain(color: Colors.yellow),
-          SpinKitChasingDots(color: Colors.red),
-          SpinKitPumpingHeart(color: Colors.blueGrey),
-          SpinKitPulse(color: Colors.pinkAccent),
-          SpinKitDoubleBounce(color: Colors.amber),
+      home: MyHomePage(),
+    );
+  }
+}
 
-          //Waves
-          SpinKitWave(color: Colors.red, type: SpinKitWaveType.start),
-          SpinKitWave(color: Colors.green, type: SpinKitWaveType.center),
-          SpinKitWave(color: Colors.blue, type: SpinKitWaveType.end),
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
-          //Wander cubes
-          SpinKitThreeBounce(color: Colors.pink),
-          SpinKitWanderingCubes(color: Colors.lime),
-          SpinKitWanderingCubes(color: Colors.orange, shape: BoxShape.circle),
+class _MyHomePageState extends State<MyHomePage> {
+  final CategoriesScroller categoriesScroller = CategoriesScroller();
+  ScrollController controller = ScrollController();
+  bool closeTopContainer = false;
+  double topContainer = 0;
 
-          //circle & fading four
-          SpinKitCircle(
-            color: Colors.tealAccent,
-            duration: (2),
+  List<Widget> itemsData = [];
 
-          ),
-          SpinKitFadingFour(color: Colors.white),
-          SpinKitFadingFour(color: Colors.indigo, shape: BoxShape.rectangle),
+  void getPostsData() {
+    List<dynamic> responseList = FOOD_DATA;
+    List<Widget> listItems = [];
+    responseList.forEach((post) {
+      listItems.add(Container(
+          height: 150,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20.0)), color: Colors.white, boxShadow: [
+            BoxShadow(color: Colors.black.withAlpha(100), blurRadius: 10.0),
+          ]),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-          //fading cubes
-          SpinKitFadingCube(color: Colors.cyan),
-          SpinKitCubeGrid(size: 51.0, color: Colors.pinkAccent),
-          SpinKitFoldingCube(color: Colors.lightBlue),
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
 
-          //Ring
-
-          SpinKitRing(color: Colors.redAccent),
-          SpinKitDualRing(color: Colors.amberAccent),
-          SpinKitRipple(color: Colors.greenAccent),
-
-          //Grid
-          SpinKitFadingGrid(color: Colors.teal),
-          SpinKitFadingGrid(color: Colors.purple, shape: BoxShape.rectangle),
-
-          //spinning
-          SpinKitSpinningCircle(color: Colors.deepOrange),
-          SpinKitSpinningCircle(
-              color: Colors.deepPurpleAccent, shape: BoxShape.rectangle),
-
-          //hourglass
-          SpinKitHourGlass(color: Colors.blueAccent),
-          //SpinKitPouringHourglass(color: Colors.redAccent),
-
-          SpinKitFadingCircle(
-            itemBuilder: (BuildContext context, int index) {
-              return DecoratedBox(
-                decoration: BoxDecoration(
-                  color: index.isEven ? Colors.red : Colors.green,
+                    Text(
+                      post["name"],
+                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      post["brand"],
+                      style: const TextStyle(fontSize: 17, color: Colors.grey),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "\$ ${post["price"]}",
+                      style: const TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold),
+                    )
+                  ],
                 ),
-              );
-            },
+                Image.asset(
+                  "assets/images/${post["image"]}",
+                  height: double.infinity,
+                )
+              ],
+            ),
+          )));
+    });
+    setState(() {
+      itemsData = listItems;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPostsData();
+    controller.addListener(() {
+
+      double value = controller.offset/119;
+
+      setState(() {
+        topContainer = value;
+        closeTopContainer = controller.offset > 50;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    final double categoryHeight = size.height*0.30;
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          leading: Icon(
+            Icons.menu,
+            color: Colors.black,
           ),
-          SpinKitSquareCircle(
-            color: Colors.green,
-            size: 50.0,
-            controller: AnimationController(
-                vsync: this, duration: Duration(milliseconds: 200)),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.black),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.person, color: Colors.black),
+              onPressed: () {},
+            )
+          ],
+        ),
+        body: Container(
+          height: size.height,
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text(
+                    "Loyality Cards",
+                    style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  Text(
+                    "Menu",
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: closeTopContainer?0:1,
+                child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: size.width,
+                    alignment: Alignment.topCenter,
+                    height: closeTopContainer?0:categoryHeight,
+                    child: categoriesScroller),
+              ),
+              Expanded(
+                  child: ListView.builder(
+                      controller: controller,
+                      itemCount: itemsData.length,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        double scale = 1.0;
+                        if (topContainer > 0.5) {
+                          scale = index + 0.5 - topContainer;
+                          if (scale < 0) {
+                            scale = 0;
+                          } else if (scale > 1) {
+                            scale = 1;
+                          }
+                          if(index == 0)
+                            {
+                              print('1st');
+                            }
+                        }
+                        return GestureDetector(
+                            child: Align(
+                                heightFactor: 0.7,
+                                alignment: Alignment.topCenter,
+                                child: itemsData[index]),
+                              if (index == 0)
+                                {
+                                  onTap: ()
+                                  {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => File()),
+                                    );
+                                  }
+                                };
+
+    );
+                      })),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class CategoriesScroller extends StatelessWidget {
+  const CategoriesScroller();
+
+  @override
+  Widget build(BuildContext context) {
+    final double categoryHeight = MediaQuery.of(context).size.height * 0.30 - 50;
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        child: FittedBox(
+          fit: BoxFit.fill,
+          alignment: Alignment.topCenter,
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 150,
+                margin: EdgeInsets.only(right: 20),
+                height: categoryHeight,
+                decoration: BoxDecoration(color: Colors.orange.shade400, borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Most\nFavorites",
+                        style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "20 Items",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: 150,
+                margin: EdgeInsets.only(right: 20),
+                height: categoryHeight,
+                decoration: BoxDecoration(color: Colors.blue.shade400, borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Newest",
+                          style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "20 Items",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 150,
+                margin: EdgeInsets.only(right: 20),
+                height: categoryHeight,
+                decoration: BoxDecoration(color: Colors.lightBlueAccent.shade400, borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Super\nSaving",
+                        style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "20 Items",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
